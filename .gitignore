@@ -1,0 +1,24 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+
+## Testes / cobertura
+[Tt]est[Rr]esult*/
+*.trx
+
+## IDEs
+.vs/
+.vscode/
+*.swp
+
+## Frontend (React/Vite) — Fase 4
+node_modules/
+dist/
+.env
+.env.local
+
+## Sistema operacional
+.DS_Store
+Thumbs.db

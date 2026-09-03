@@ -1,0 +1,21 @@
+sequenceDiagram
+    autonumber
+    actor U as Usuário
+    participant FE as React (Dashboard)
+    participant API as DashboardController
+    participant SVC as DashboardService
+    participant REPO as TransacaoRepository
+    participant DB as PostgreSQL
+
+    U->>FE: Abre o Dashboard
+    FE->>API: GET /api/dashboard/sugestao-investimento?mes=8&ano=2026<br/>(Authorization: Bearer JWT)
+    API->>API: Valida JWT e extrai UsuarioId
+    API->>SVC: ObterSugestaoInvestimento(usuarioId, mes, ano)
+    SVC->>REPO: ObterTotaisPorTipo(usuarioId, mes, ano)
+    REPO->>DB: SELECT Tipo, SUM(Valor)<br/>GROUP BY Tipo
+    DB-->>REPO: receitas, despesas
+    REPO-->>SVC: TotaisDto
+    SVC->>SVC: saldo = renda + receitas - despesas<br/>reserva = 10% da renda<br/>sugestao = max(0, saldo - reserva)
+    SVC-->>API: SugestaoInvestimentoDto
+    API-->>FE: 200 OK { saldo, reservaSeguranca, valorSugerido }
+    FE-->>U: Card "Você pode investir R$ X este mês" 📈

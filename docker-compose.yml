@@ -1,0 +1,40 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-fincontrol}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "5432:5432"
+    volumes:
+      - fincontrol-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-fincontrol}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: FinControl.Api/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=${POSTGRES_DB:-fincontrol};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-postgres}"
+      Jwt__Key: ${JWT_KEY:-troque-esta-chave-para-um-segredo-forte-de-pelo-menos-32-caracteres}
+      Jwt__Issuer: ${JWT_ISSUER:-FinControl.Api}
+      Jwt__Audience: ${JWT_AUDIENCE:-FinControl.Client}
+      Jwt__ExpirationMinutes: ${JWT_EXPIRATION_MINUTES:-60}
+      FrontendOrigins__0: ${FRONTEND_ORIGIN:-http://localhost:5173}
+    ports:
+      - "5106:8080"
+
+volumes:
+  fincontrol-db-data:

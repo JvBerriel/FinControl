@@ -1,0 +1,10 @@
+**/bin/
+**/obj/
+**/.vs/
+**/.vscode/
+frontend/node_modules/
+frontend/dist/
+docs/
+*.md
+.git/
+.gitignore

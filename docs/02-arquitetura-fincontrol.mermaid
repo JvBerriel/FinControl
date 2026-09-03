@@ -1,0 +1,43 @@
+flowchart TB
+    subgraph Cliente["🖥️ Frontend — React + TypeScript (Vite)"]
+        UI["Componentes React<br/>(Dashboard, Transações, Login)"]
+        TQ["TanStack Query<br/>(cache e chamadas HTTP)"]
+        UI --> TQ
+    end
+
+    TQ -- "HTTPS / JSON (JWT no header)" --> API
+
+    subgraph Backend["⚙️ Backend — ASP.NET Core 8"]
+        subgraph ApiLayer["FinControl.Api"]
+            API["Controllers REST<br/>+ Middleware de Auth JWT<br/>+ Swagger"]
+        end
+
+        subgraph AppLayer["FinControl.Application"]
+            SVC["Services<br/>(TransacaoService, DashboardService)"]
+            DTO["DTOs + FluentValidation"]
+            SVC --- DTO
+        end
+
+        subgraph DomainLayer["FinControl.Domain"]
+            ENT["Entidades<br/>(Usuario, Transacao, Categoria)"]
+            IREPO["Interfaces<br/>(ITransacaoRepository...)"]
+        end
+
+        subgraph InfraLayer["FinControl.Infrastructure"]
+            REPO["Repositories (EF Core)"]
+            CTX["AppDbContext + Migrations"]
+            REPO --> CTX
+        end
+
+        API --> SVC
+        SVC --> IREPO
+        REPO -. "implementa" .-> IREPO
+        SVC --> ENT
+        REPO --> ENT
+    end
+
+    CTX -- "Npgsql provider" --> DB[("🐘 PostgreSQL")]
+
+    style Cliente fill:#1e3a5f,color:#fff
+    style DomainLayer fill:#4a5d23,color:#fff
+    style DB fill:#336791,color:#fff

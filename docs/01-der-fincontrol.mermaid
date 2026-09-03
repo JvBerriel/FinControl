@@ -1,0 +1,44 @@
+erDiagram
+    USUARIO ||--o{ TRANSACAO : registra
+    USUARIO ||--o{ CATEGORIA : possui
+    USUARIO ||--o{ META_MENSAL : define
+    CATEGORIA ||--o{ TRANSACAO : classifica
+    CATEGORIA ||--o{ META_MENSAL : limita
+
+    USUARIO {
+        int Id PK
+        string Nome
+        string Email UK
+        string SenhaHash
+        decimal RendaMensal
+        datetime CriadoEm
+    }
+
+    CATEGORIA {
+        int Id PK
+        int UsuarioId FK
+        string Nome
+        string Cor
+        string Icone
+        bool Ativa
+    }
+
+    TRANSACAO {
+        int Id PK
+        int UsuarioId FK
+        int CategoriaId FK
+        string Descricao
+        decimal Valor
+        int Tipo "1=Receita 2=Despesa"
+        date DataTransacao
+        datetime CriadoEm
+    }
+
+    META_MENSAL {
+        int Id PK
+        int UsuarioId FK
+        int CategoriaId FK
+        decimal ValorLimite
+        int Mes
+        int Ano
+    }
