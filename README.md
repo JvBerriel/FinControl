@@ -96,9 +96,12 @@ Depois, rode o frontend separadamente (veja abaixo).
 
 ```bash
 # 1. Banco de dados
-# Ajuste FinControl.Api/appsettings.json (ConnectionStrings:DefaultConnection) se necessário
+# Crie um banco PostgreSQL local (ex: "fincontrol")
 
-# 2. Backend
+# 2. Backend — segredos via User Secrets (nunca em appsettings.json)
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Port=5432;Database=fincontrol;Username=postgres;Password=SUA_SENHA" --project FinControl.Api
+dotnet user-secrets set "Jwt:Key" "uma-chave-forte-com-pelo-menos-32-caracteres" --project FinControl.Api
+
 dotnet tool install --global dotnet-ef   # se ainda não tiver
 dotnet ef database update --project FinControl.Infrastructure --startup-project FinControl.Api
 dotnet run --project FinControl.Api
@@ -131,6 +134,11 @@ Cobre os services da camada `Application` (`CategoriaService`, `TransacaoService
 | `VITE_API_URL` | Frontend | URL base da API |
 
 Veja `.env.example` (raiz, para o Docker Compose) e `frontend/.env` (para o Vite).
+
+Fora do Docker, `ConnectionStrings:DefaultConnection` e `Jwt:Key` **não** ficam em `appsettings.json`
+(que só tem placeholders) — use [User Secrets](https://learn.microsoft.com/aspnet/core/security/app-secrets)
+em desenvolvimento (`dotnet user-secrets set ... --project FinControl.Api`, exemplo na seção acima) e
+variáveis de ambiente reais em produção.
 
 ## Deploy
 
